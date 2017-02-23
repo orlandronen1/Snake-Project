@@ -25,5 +25,5 @@ Loop for rest of game:
   Check wall
     Change direction
   Check frog
-  Move/Grow
+    Move/Grow
   Increment time counter
