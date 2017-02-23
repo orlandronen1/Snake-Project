@@ -7,6 +7,11 @@ Functions:
   Change direction ---> Changes direction if needed (hit wall)
   Check snake ---> Check if next LED is part of the snake, if yes go to Exit
   Exit ---> Ends the game, display time played and score
+  Build board ---> read the board string and set the appropriate LEDs to red
+                    If char = *, turn LED on
+                    If char = 0x00, end loop
+                    If char = anything else, ignore
+  Populate frogs --->
   
   Get LED 
   Set LED
@@ -14,7 +19,7 @@ Functions:
   
 Initialize game:
   Read board string
-  Set board (Red LEDS)
+  Build board (Red LEDS)
   Populate frogs (Can't be on walls [or snake start position?])
   Create snake
   
@@ -27,3 +32,14 @@ Loop for rest of game:
   Check frog
     Move/Grow
   Increment time counter
+
+
+Variables:
+  Snake head
+  Snake tail
+  Snake body
+  RNG for frogs
+  Time
+  Score
+  LED address(es)
+  stack?
