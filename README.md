@@ -1,0 +1,2 @@
+# Snake-Project
+Midterm project
