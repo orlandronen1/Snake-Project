@@ -4,77 +4,113 @@
 
 .data 
   
-  # The board. Every * indicates an LED turned on as a wall.
-  .ascii  "*****************************************************  *****************"	# Top border
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                 ***************                      *"
-  .ascii  "*                                 *                                    *"
-  .ascii  "*                                 * *************                      *"
-  .ascii  "*                                 * *                                  *"
-  .ascii  "*                                 * *                                  *"
-  .ascii  "*                                 * *                                  *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                        **************                *"
-  .ascii  "*                                        *            *                *"
-  .ascii  "*                                        *            *                *"
-  .ascii  "*                                        *            *                *"
-  .ascii  "*                                        *            *                *"
-  .ascii  "*                                                ******     *          *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                       ********************           *"
-  .ascii  "*                                       *                  *           *"
-  .ascii  "*                                       *   ************   *           *"
-  .ascii  "*                                           *          *   *           *"
-  .ascii  "*                                           *          *   *           *"
-  .ascii  "*                                       *   *          *   *           *"
-  .ascii  "*                                       *   *          *   *           *"
-  .ascii  "*                                       *   *          *   *           *"
-  .ascii  "*                                       *   ************   *           *"
-  .ascii  "*                                       *                  *           *"
-  .ascii  "*                                       *                  *           *"
-  .ascii  "*                                       ********************           *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                                                                      *"
-  .ascii  "*                     * *                                              *"
-  .ascii  "*                     * *                                              *"
-  .ascii  "*                     * *                                              *"
-  .ascii  "*                     * *                                              *"
-  .ascii  "*********************** *                           ********************"
-  .ascii  "                        *                           *                   "
-  .ascii  "*************************                           *  *****************"
-  .ascii  "*                                                   *  *               *"
-  .ascii  "*                                                   *  *               *"
-  .ascii  "*                                                   *  *               *"
-  .ascii  "*                                                   *  *               *"
-  .ascii  "*                                                   *  *               *"
-  .ascii  "*                                                   *                  *"
-  .ascii  "*                                                   *                  *"
-  .ascii  "*                                                   *  *               *"
-  .ascii  "*                                                   *  *               *"
-  .asciiz "*****************************************************  *****************"	# Bottom border, null terminated
+# The board. Every * indicates an LED turned on as a wall.
+  .ascii  "*****************************************************  *********"	# Top border
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                 ***************              *"
+  .ascii  "*                                 *                            *"
+  .ascii  "*                                 * *************              *"
+  .ascii  "*                                 * *                          *"
+  .ascii  "*                                 * *                          *"
+  .ascii  "*                                 * *                          *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                        **************        *"
+  .ascii  "*                                        *            *        *"
+  .ascii  "*                                        *            *        *"
+  .ascii  "*                                        *            *        *"
+  .ascii  "*                                        *            *        *"
+  .ascii  "*                                                ******     *  *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                       ********************   *"
+  .ascii  "*                                       *                  *   *"
+  .ascii  "*                                       *   ************   *   *"
+  .ascii  "*                                           *          *   *   *"
+  .ascii  "*                                           *          *   *   *"
+  .ascii  "*                                       *   *          *   *   *"
+  .ascii  "*                                       *   *          *   *   *"
+  .ascii  "*                                       *   *          *   *   *"
+  .ascii  "*                                       *   ************   *   *"
+  .ascii  "*                                       *                  *   *"
+  .ascii  "*                                       *                  *   *"
+  .ascii  "*                                       ********************   *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                                                              *"
+  .ascii  "*                     * *                                      *"
+  .ascii  "*                     * *                                      *"
+  .ascii  "*                     * *                                      *"
+  .ascii  "*                     * *                                      *"
+  .ascii  "*********************** *                           ************"
+  .ascii  "                        *                           *           "
+  .ascii  "*************************                           *  *********"
+  .ascii  "*                                                   *  *       *"
+  .ascii  "*                                                   *  *       *"
+  .ascii  "*                                                   *  *       *"
+  .ascii  "*                                                   *  *       *"
+  .ascii  "*                                                   *  *       *"
+  .ascii  "*                                                   *          *"
+  .ascii  "*                                                   *          *"
+  .ascii  "*                                                   *  *       *"
+  .ascii  "*                                                   *  *       *"
+  .asciiz "*****************************************************  *********"	# Bottom border, null terminated
   
 #================================================================  
   
 .text
 
-
+# void _buildWall()
+	#   fills LED board with walls based on string stored in memory
+	#   uses _setLED in loop
+	#
+	# arguments: 
+	# trashes:
+	# returns: none
+	#
+_buildWall:
+  la $s0, 0x10010000
+  addi $a0, $a0, 0
+  addi $a1, $a1, 0
+  addi $a2, $a2, 1
+  
+  Loop:
+  	lb $t0, 0($s0)
+  	beq $t0, 0x2a, JUMP
+  	beq $t0, 0x00, EXIT
+  	addi $a0, $a0, 1
+  	beq $a0, 64, NEWLINE
+  	addi $s0, $s0, 1
+  	j Loop
+  
+  JUMP: jal _setLED
+  	addi $a0, $a0, 1
+  	beq $a0, 64, NEWLINE
+  	addi $s0, $s0, 1
+  	j Loop
+  
+  NEWLINE:
+  	add $a0, $zero, $zero
+  	addi $a1, $a1, 1
+  	addi $s0, $s0, 1
+  	j Loop
+  
+  EXIT: li $v0, 10
+  	syscall
 
 # void _setLED(int x, int y, int color)
 	#   sets the LED at (x,y) to color
