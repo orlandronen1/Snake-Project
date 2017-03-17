@@ -4,7 +4,7 @@ Functions:
       store locations of the head & body & tail
       after determining direction and next loc of head, store that in the queue and increment head pointer
       set current tail LED off and increment tail pointer
-      if at end of queue, wrap around to beginning of memory space
+      if at end of queue, wrap around to beginning of memory space (la s0 and addi s0, 1)
   Check direction ---> Read keypad/last dir, use for move
   Check frog --> Check if next LED is a frog, if yes do Grow instead of Move
     Grow ---> Move head, add segment to body, tail remains in place, increments score
@@ -17,7 +17,7 @@ Functions:
                     If char = *, turn LED on
                     If char = 0x00, end loop
                     If char = anything else, ignore
-  *done* Populate frogs --->
+  *done* Populate frogs 
   
   Get LED 
   Set LED
@@ -51,12 +51,14 @@ Loop for rest of game:
 
 
 Variables:
-  Snake head
-  Snake tail
-  Snake body
-  # frogs generated
+  Snake head pointer
+  Snake tail pointer
+  Snake body (don't need a pointer or anything)
+  # frogs generated (s1)
   Time
+    time began
+    last time moved (possible temp)
+    (temp) curr time
   Score (# frogs eaten)
   LED address(es)
   stack?
-  last time moved
