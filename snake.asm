@@ -70,6 +70,8 @@
   .ascii  "*                                                   *  *       *"
   .asciiz "*****************************************************  *********"	# Bottom border, null terminated
   
+  _snake:	.space 80	# Allocate space to store snake
+  
 #=================================================================================================================
 #===========                                          Program                                          ===========
 #=================================================================================================================
@@ -124,11 +126,30 @@ _buildWall:
 	# Body = [10 to 5,31]
 	# Tail = (4,31)
 	#
-	# arguments: 
-	# trashes: 
+	# arguments: $s0 is snake location, 
+	# trashes: $t4
 	# returns: none
 	#
 _buildSnake:
+	li	$a3, 2			# Set color to yellow for snake
+	la	$s0, _snake		# Load address of snake 
+	addi	$s0, 1			# Realign memory address
+	addi	$t4, $0, 0x041f		# t4 = value of location of tail beginning
+	sh	$t4, ($s0)		# store location of tail
+	lb	$a0, 1($s0)		# get x loc for tail
+	lb	$a1, ($s0)		# get y loc for tail
+	jal	_setLED			# set color
+	
+  LOOP_buildSnake:
+  	addi	$t5, $t5, 1		# Incrementer for build loop
+	beq	$t5, 8, _populateFrogs	# if fully built, populate frogs
+	addi	$s0, $s0, 2		# Increment address
+	addi	$t4, $t4, 0x100		# Increment X loc 
+	sh	$t4, ($s0)		# store location of tail
+	lb	$a0, 1($s0)		# get x loc for current segment
+	lb	$a1, ($s0)		# get y loc for current segment
+	jal	_setLED			# set color
+	j	LOOP_buildSnake		# Loop again
 	
 #**************************************************************************************	
 	
