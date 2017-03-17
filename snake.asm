@@ -91,7 +91,7 @@ _buildWall:
   Loop:
   	lb $t0, 0($s0)
   	beq $t0, 0x2a, JUMP
-  	beq $t0, 0x00, EXIT
+  	beq $t0, 0x00, EXIT_WALL	# change to go to _buildSnake
   	addi $a0, $a0, 1
   	beq $a0, 64, NEWLINE
   	addi $s0, $s0, 1
@@ -102,15 +102,26 @@ _buildWall:
   	beq $a0, 64, NEWLINE
   	addi $s0, $s0, 1
   	j Loop
-  
+	
   NEWLINE:
   	add $a0, $zero, $zero
   	addi $a1, $a1, 1
   	addi $s0, $s0, 1
   	j Loop
   
-  EXIT: li $v0, 10
-  	syscall
+  EXIT_WALL: 	# doesn't need to terminate session, replace with _buildSnake
+  	# li $v0, 10
+  	# syscall
+	
+	
+# void _populateFrogs()
+	# Sets random LED to green for a frog
+	# Does not change to green if LED is part of wall, snake, or another frog
+	# Does 32 attempts, but doesn't necessarily produce 32 frogs
+	#
+_populateFrogs():
+	
+
 
 # void _setLED(int x, int y, int color)
 	#   sets the LED at (x,y) to color
