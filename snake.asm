@@ -71,7 +71,7 @@
   .asciiz "*****************************************************  *********"	# Bottom border, null terminated
   
 #=================================================================================================================
-#=========                                          Program                                         ==============
+#===========                                          Program                                          ===========
 #=================================================================================================================
 
 #*****
@@ -138,30 +138,33 @@ _buildSnake:
 	# Does 32 attempts, but doesn't necessarily produce 32 frogs
 	#
 	# arguments: $a0 is x, $a1 is y, $a2 is color 
-	# trashes: $t0-$t1
+	# trashes: $t4-$t5
 	# returns: $s1 is # of frogs populated by end
 	#
 _populateFrogs:
 	li	$a2, 3			# Set color to green
-	li	$t0, 0			# t0 = attempt counter, loop stops at 32
+	li	$t4, 0			# t0 = attempt counter, loop stops at 32
  
   LOOP_FROG:
-	beq	$t0, 32, EXIT		# If 32 attempts have been made, exit (change to start game)
+	beq	$t4, 32, EXIT		# If 32 attempts have been made, exit (change to start game)
 	
 	li	$v0, 42			# Generate random int range syscall
 	li	$a1, 64			# Set upper limit to 64
 	syscall				# Generate random Y value
-	add	$t1, $a0, $0		# Store Y value in t1
+	add	$t5, $a0, $0		# Store Y value in t1
 	syscall				# Generate random X value
-	add	$a1, $t1, $0		# Restore Y value in a1 for _getLED call
+	add	$a1, $t5, $0		# Restore Y value in a1 for _getLED call
 	
   	jal	_getLED			# Get value of LED at loc, stored in $v0
-	addi	$t0, $t0, 1		# increment attempt counter
+	addi	$t4, $t4, 1		# increment attempt counter
 	bne	$v0, $zero, LOOP_FROG	# If LED is already taken, do another attempt
 	jal	_setLED			# Else, set current position to be a frog
 	addi	$s1, $s1, 1		# Increment frog counter
 	j	LOOP_FROG		# Loop again
   
+  EXIT:
+  li	$v0, 10
+  syscall
 #**************************************************************************************
 
 # void _setLED(int x, int y, int color)
