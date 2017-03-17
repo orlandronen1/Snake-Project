@@ -3,33 +3,34 @@ Functions:
   Check direction ---> Read keypad/last dir, use for move
   Check frog --> Check if next LED is a frog, if yes do Grow instead of Move
     Grow ---> Move head, add segment to body, tail remains in place, increments score
+                if score == # frogs generated, game is over, exit
   Check wall ---> Check if next LED is a wall, if yes go to Change direction
   Change direction ---> Changes direction if needed (hit wall)
   Check snake ---> Check if next LED is part of the snake, if yes go to Exit
   Exit ---> Ends the game, display time played and score
-  Build board ---> read the board string and set the appropriate LEDs to red
+  *done* Build board ---> read the board string and set the appropriate LEDs to red
                     If char = *, turn LED on
                     If char = 0x00, end loop
                     If char = anything else, ignore
-  Populate frogs --->
+  *done* Populate frogs --->
   
   Get LED 
   Set LED
   
   
 Initialize game:
-  Read board string
-  Build board (Red LEDS)
+  Read board string *done*
+  Build board (Red LEDS) *done*
   Create snake
   - row 31, cols 4-10
   - set head var & address
   - set body array & addresses
   - set tail var and address
-  Populate frogs (Can't be on walls [or snake start position?])
+  Populate frogs (Can't be on walls [or snake start position?])  *done*
   
   
 Loop for rest of game:
-  Check direction
+  Check direction/keystroke
   Check snake
     Exit
   Check wall
@@ -43,8 +44,8 @@ Variables:
   Snake head
   Snake tail
   Snake body
-  RNG for frogs
+  # frogs generated
   Time
-  Score
+  Score (# frogs eaten)
   LED address(es)
   stack?
