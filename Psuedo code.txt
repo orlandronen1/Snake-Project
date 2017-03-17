@@ -1,5 +1,10 @@
 Functions: 
   Move ---> Move head and tail in current direction
+      use a queue for the snake
+      store locations of the head & body & tail
+      after determining direction and next loc of head, store that in the queue and increment head pointer
+      set current tail LED off and increment tail pointer
+      if at end of queue, wrap around to beginning of memory space
   Check direction ---> Read keypad/last dir, use for move
   Check frog --> Check if next LED is a frog, if yes do Grow instead of Move
     Grow ---> Move head, add segment to body, tail remains in place, increments score
@@ -26,10 +31,15 @@ Initialize game:
   - set head var & address
   - set body array & addresses
   - set tail var and address
-  Populate frogs (Can't be on walls [or snake start position?])  *done*
+  Populate frogs (Can't be on walls or snake start position)  *done*
   
   
 Loop for rest of game:
+  Time loop
+    time syscall
+    compare to last time
+    if <200ms, loop again
+    else, continue program
   Check direction/keystroke
   Check snake
     Exit
@@ -49,3 +59,4 @@ Variables:
   Score (# frogs eaten)
   LED address(es)
   stack?
+  last time moved
