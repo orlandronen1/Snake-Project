@@ -20,8 +20,13 @@ Functions:
 Initialize game:
   Read board string
   Build board (Red LEDS)
-  Populate frogs (Can't be on walls [or snake start position?])
   Create snake
+  - row 31, cols 4-10
+  - set head var & address
+  - set body array & addresses
+  - set tail var and address
+  Populate frogs (Can't be on walls [or snake start position?])
+  
   
 Loop for rest of game:
   Check direction
