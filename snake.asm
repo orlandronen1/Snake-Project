@@ -70,9 +70,15 @@
   .ascii  "*                                                   *  *       *"
   .asciiz "*****************************************************  *********"	# Bottom border, null terminated
   
-#================================================================  
-  
+#=================================================================================================================
+#=========                                          Program                                         ==============
+#=================================================================================================================
+
+#*****
 .text
+#*****
+
+#**************************************************************************************
 
 # void _buildWall()
 	#   fills LED board with walls based on string stored in memory
@@ -83,45 +89,80 @@
 	# returns: none
 	#
 _buildWall:
-  la $s0, 0x10010000
-  addi $a0, $a0, 0
-  addi $a1, $a1, 0
-  addi $a2, $a2, 1
+	la $s0, 0x10010000		# Load address of wall string
+  	addi $a0, $a0, 0		# Start x at 0
+  	addi $a1, $a1, 0		# Start y at 0
+  	addi $a2, $a2, 1		# Set color to red
   
-  Loop:
-  	lb $t0, 0($s0)
-  	beq $t0, 0x2a, JUMP
-  	beq $t0, 0x00, EXIT_WALL	# change to go to _buildSnake
-  	addi $a0, $a0, 1
-  	beq $a0, 64, NEWLINE
-  	addi $s0, $s0, 1
-  	j Loop
+  LOOP_WALL:
+  	lb $t0, 0($s0)			# Load next char to inspect
+  	beq $t0, 0x2a, JUMP_WALL	
+  	beq $t0, 0x00, _buildSnake	# Wall sequence is over, go to build snake
+  	addi $a0, $a0, 1		# Increment x
+  	beq $a0, 64, NEWLINE		# If at end of row, go to next line
+  	addi $s0, $s0, 1		# Increment string address
+  	j LOOP_WALL			
   
-  JUMP: jal _setLED
-  	addi $a0, $a0, 1
-  	beq $a0, 64, NEWLINE
-  	addi $s0, $s0, 1
-  	j Loop
+  JUMP_WALL: 
+  	jal _setLED			
+  	addi $a0, $a0, 1		# Increment x
+  	beq $a0, 64, NEWLINE		# If end of row, go to next line
+  	addi $s0, $s0, 1		# Else, increment string address
+  	j LOOP_WALL
 	
   NEWLINE:
-  	add $a0, $zero, $zero
-  	addi $a1, $a1, 1
-  	addi $s0, $s0, 1
-  	j Loop
-  
-  EXIT_WALL: 	# doesn't need to terminate session, replace with _buildSnake
-  	# li $v0, 10
-  	# syscall
+  	add $a0, $zero, $zero		# Reset x to 0
+  	addi $a1, $a1, 1		# Increment y
+  	addi $s0, $s0, 1		# Increment string address
+  	j LOOP_WALL
 	
+#**************************************************************************************	
 	
-# void _populateFrogs()
+# void _buildSnake
+	# Initializes snake head, body, and tail
+	# Head = (11,31)
+	# Body = [10 to 5,31]
+	# Tail = (4,31)
+	#
+	# arguments: 
+	# trashes: 
+	# returns: none
+	#
+_buildSnake:
+	
+#**************************************************************************************	
+	
+# int _populateFrogs()
 	# Sets random LED to green for a frog
 	# Does not change to green if LED is part of wall, snake, or another frog
 	# Does 32 attempts, but doesn't necessarily produce 32 frogs
 	#
-_populateFrogs():
+	# arguments: $a0 is x, $a1 is y, $a2 is color 
+	# trashes: $t0-$t1
+	# returns: $s1 is # of frogs populated by end
+	#
+_populateFrogs:
+	li	$a2, 3			# Set color to green
+	li	$t0, 0			# t0 = attempt counter, loop stops at 32
+ 
+  LOOP_FROG:
+	beq	$t0, 32, EXIT		# If 32 attempts have been made, exit (change to start game)
 	
-
+	li	$v0, 42			# Generate random int range syscall
+	li	$a1, 64			# Set upper limit to 64
+	syscall				# Generate random Y value
+	add	$t1, $a0, $0		# Store Y value in t1
+	syscall				# Generate random X value
+	add	$a1, $t1, $0		# Restore Y value in a1 for _getLED call
+	
+  	jal	_getLED			# Get value of LED at loc, stored in $v0
+	addi	$t0, $t0, 1		# increment attempt counter
+	bne	$v0, $zero, LOOP_FROG	# If LED is already taken, do another attempt
+	jal	_setLED			# Else, set current position to be a frog
+	addi	$s1, $s1, 1		# Increment frog counter
+	j	LOOP_FROG		# Loop again
+  
+#**************************************************************************************
 
 # void _setLED(int x, int y, int color)
 	#   sets the LED at (x,y) to color
@@ -155,7 +196,7 @@ _setLED:
 	sb	$t3,0($t0)     # update display
 	jr	$ra
 	
-  
+#**************************************************************************************
   
 	# int _getLED(int x, int y)
 	#   returns the value of the LED at position (x,y)
