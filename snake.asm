@@ -71,6 +71,11 @@
   .asciiz "*****************************************************  *********"	# Bottom border, null terminated
   
   _snake:	.space 80	# Allocate space to store snake
+  win_message:		.asciiz	"Congratulations, you win!\n"	# Message displayed upon winning
+  lose_message:		.asciiz "Game over, you lose!\n"	# Message displayed upon losing
+  score_message:	.asciiz "Your final score is: "		# Score display message
+  time_message:		.asciiz "\nYour time played is: "	# Time display message
+  unit_message:		.asciiz "s"				# Show units of time
   
 #=================================================================================================================
 #===========                                          Program                                          ===========
@@ -126,7 +131,7 @@ _buildWall:
 	# Body = [10 to 5,31]
 	# Tail = (4,31)
 	#
-	# arguments: $s0 is snake location, 
+	# arguments: $s0 is snake location
 	# trashes: $t4
 	# returns: none
 	#
@@ -167,7 +172,7 @@ _populateFrogs:
 	li	$t4, 0			# t0 = attempt counter, loop stops at 32
  
   LOOP_FROG:
-	beq	$t4, 32, EXIT		# If 32 attempts have been made, exit (change to start game)
+	beq	$t4, 32, GAME_START	# If 32 attempts have been made, ready to start game
 	
 	li	$v0, 42			# Generate random int range syscall
 	li	$a1, 64			# Set upper limit to 64
@@ -183,9 +188,59 @@ _populateFrogs:
 	addi	$s1, $s1, 1		# Increment frog counter
 	j	LOOP_FROG		# Loop again
   
-  EXIT:
-  li	$v0, 10
-  syscall
+#**************************************************************************************
+#				Game loop starts here
+#
+# Variable list:
+#	s0 = address of snake data
+#	s1 = # of frogs on board
+#	s2 = frogs eaten (score)
+#	s3 = game start time
+#	s4 = head pointer
+#	s5 = tail pointer
+#	t9 = last system time of animation run
+#**************************************************************************************
+
+# Begins game loop, initializes time
+GAME_START:
+	
+	li	$v0, 30		# System time syscall
+	syscall			# a0 = lower 32 bits of sys time
+	move	$s3, $a0	# Store start time in s3
+	move	$t9, $a0
+	
+# void TIME_LOOP
+# gets current system time, compares to last system time of successful animation  
+#
+# arguments: a0 = current system time, t9 = system time to check against
+# trashes: t1
+TIME_LOOP: 
+	li	$v0, 30			# System time syscall
+	syscall				# a0 = lower 32 bits of sys time
+	sub	$t1, $a0, $t9		# Check time difference 
+	blt	$t1, 200, TIME_LOOP	# if <200ms passed, reloop
+	move	$t9, $a0		# Else, update last run time
+	j	CHECK_DIR		# Go to next function in game
+	
+#**************************************************************************************
+
+CHECK_DIR:
+	
+#**************************************************************************************
+#				Game loop over
+#**************************************************************************************
+
+# Game is over, either due to winning or meeting a lose condition
+# Displays game over message
+#  -Score
+#  -Time played
+GAME_OVER:
+	
+	
+	li	$v0, 10		# Terminate program
+	syscall		
+	
+#**************************************************************************************
 #**************************************************************************************
 
 # void _setLED(int x, int y, int color)
