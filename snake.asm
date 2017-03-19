@@ -81,9 +81,7 @@
 #===========                                          Program                                          ===========
 #=================================================================================================================
 
-#*****
 .text
-#*****
 
 #**************************************************************************************
 
@@ -204,7 +202,7 @@ _populateFrogs:
 # Begins game loop, initializes time
 GAME_START:
 	
-	li	$v0, 30		# System time syscall
+	li	$v0, 30		# System time service
 	syscall			# a0 = lower 32 bits of sys time
 	move	$s3, $a0	# Store start time in s3
 	move	$t9, $a0
@@ -215,12 +213,11 @@ GAME_START:
 # arguments: a0 = current system time, t9 = system time to check against
 # trashes: t1
 TIME_LOOP: 
-	li	$v0, 30			# System time syscall
+	li	$v0, 30			# System time service
 	syscall				# a0 = lower 32 bits of sys time
 	sub	$t1, $a0, $t9		# Check time difference 
 	blt	$t1, 200, TIME_LOOP	# if <200ms passed, reloop
 	move	$t9, $a0		# Else, update last run time
-	j	CHECK_DIR		# Go to next function in game
 	
 #**************************************************************************************
 
@@ -234,10 +231,37 @@ CHECK_DIR:
 # Displays game over message
 #  -Score
 #  -Time played
+WIN:	li	$v0, 4			# Print string service
+	la	$a0, win_message	# Load win_message
+	syscall				# Print
+	j	GAME_OVER
+
+LOSE:	li	$v0, 4			# Print string service
+	la	$a0, lose_message	# Load lose_message
+	syscall				# Print 
+	j	GAME_OVER
+
 GAME_OVER:
+	la	$a0, score_message	# Load score_message
+	syscall				# Print string
 	
+	li	$v0, 1			# Print int service
+	move	$a0, $s2		# Load score into a0
+	syscall				# Print score
 	
-	li	$v0, 10		# Terminate program
+	li	$v0, 4			# Print string service
+	la	$a0, time_message	# Load time_message
+	syscall				# Print string
+	
+	li	$v0, 1			# Print int service
+	sub	$a0, $t9, $s3		# Get time played
+	syscall				# Print time
+	
+	li	$v0, 4			# Print string service
+	la	$a0, unit_message	# Load unit_message
+	syscall				# Print string
+	
+	li	$v0, 10			# Terminate program
 	syscall		
 	
 #**************************************************************************************
