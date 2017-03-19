@@ -138,7 +138,7 @@ _buildWall:
 _buildSnake:
 	li	$a3, 2			# Set color to yellow for snake
 	la	$s0, _snake		# Load address of snake 
-	addi	$s0, 1			# Realign memory address
+	addi	$s0, $s0, 1		# Realign memory address
 	addi	$t4, $0, 0x041f		# t4 = value of location of tail beginning
 	sh	$t4, ($s0)		# store location of tail
 	lb	$a0, 1($s0)		# get x loc for tail
