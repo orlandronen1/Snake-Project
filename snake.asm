@@ -196,6 +196,7 @@ _populateFrogs:
 #	s3 = game start time
 #	s4 = head pointer
 #	s5 = tail pointer
+#	s6 = keyboard tracker
 #	t9 = last system time of animation run
 #**************************************************************************************
 
@@ -222,7 +223,21 @@ TIME_LOOP:
 #**************************************************************************************
 
 CHECK_DIR:
+	lb	$s6, 0xFFFF0004
+	beq	$s6, 0x42, GAME_OVER	# quit the game if b is pressed
+	beq	$s6, 0xE0, GO_UP	# go up if w is pressed
+	beq	$s6, 0xE1, GO_LE	# go left if a is pressed
+	beq	$s6, 0xE2, GO_DO	# go down if s is pressed
+	beq	$s6, 0xE3, GO_RI	# go right if d is pressed
 	
+	GO_UP:
+		j TIME_LOOP
+	GO_LE:
+		j TIME_LOOP
+	GO_DO:
+		j TIME_LOOP
+	GO_RI:
+		j TIME_LOOP
 #**************************************************************************************
 #				Game loop over
 #**************************************************************************************
