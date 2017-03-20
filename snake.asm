@@ -238,6 +238,56 @@ CHECK_DIR:
 		j TIME_LOOP
 	GO_RI:
 		j TIME_LOOP
+		
+#**************************************************************************************
+
+CHECK_NEXT: 
+	# load x and y from head pointer to a0 and a1
+	# increment coordinates appropriately based on current direction
+	jal	_getLED
+	beq	$v0, 0, MOVE		# if next space is empty, move
+	beq	$v0, 1, CHANGE_DIR	# if next space is a wall, change direction
+	beq	$v0, 2, LOSE		# if next space is the snake, game is LOST
+	j	GROW			# Else, only remaining option is a frog, so
+					# to GROW
+#**************************************************************************************
+
+# Moves snake forward in current direction
+#
+# Arguments: 
+# Trashes: 
+#
+MOVE:
+	# Increments head pointer and sets that LED on
+	# Turns tail LED off and increments tail pointer
+
+#**************************************************************************************
+
+# Moves head forward (but not tail) and increments score
+#
+# Arguments:
+# Trahes:
+#
+GROW: 
+	# Increment head pointer 
+	# Set new head LED on
+	addi	$s2, $s2, 1		# Score is incremented by 1
+
+#**************************************************************************************
+
+# Changes current direction to avoid collision with a wall
+# Checks which direction is viable and won't lead to LOSE
+# If a viable dir is found, set current dir to that and do CHECK_DIR again
+#  set a temp var to check if direction has already been changed -> LOSE
+# Else, it will just MOVE after checking again
+#
+# Arguments: 
+# Trashes: 
+#
+CHANGE_DIR:
+	
+
+
 #**************************************************************************************
 #				Game loop over
 #**************************************************************************************
