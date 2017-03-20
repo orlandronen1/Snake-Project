@@ -38,11 +38,11 @@
   .ascii  "*                                       ********************   *"
   .ascii  "*                                       *                  *   *"
   .ascii  "*                                       *   ************   *   *"
-  .ascii  "*                                           *          *   *   *"
-  .ascii  "*                                           *          *   *   *"
-  .ascii  "*                                       *   *          *   *   *"
-  .ascii  "*                                       *   *          *   *   *"
-  .ascii  "*                                       *   *          *   *   *"
+  .ascii  "*                                           ************   *   *"
+  .ascii  "*                                           ************   *   *"
+  .ascii  "*                                       *   ************   *   *"
+  .ascii  "*                                       *   ************   *   *"
+  .ascii  "*                                       *   ************   *   *"
   .ascii  "*                                       *   ************   *   *"
   .ascii  "*                                       *                  *   *"
   .ascii  "*                                       *                  *   *"
@@ -75,7 +75,7 @@
   lose_message:		.asciiz "Game over, you lose!\n"	# Message displayed upon losing
   score_message:	.asciiz "Your final score is: "		# Score display message
   time_message:		.asciiz "\nYour time played is: "	# Time display message
-  unit_message:		.asciiz "s"				# Show units of time
+  unit_message:		.asciiz "ms"				# Show units of time
   
 #=================================================================================================================
 #===========                                          Program                                          ===========
@@ -137,6 +137,7 @@ _buildSnake:
 	li	$a2, 2			# Set color to yellow for snake
 	la	$s0, _snake		# Load address of snake 
 	addi	$s0, $s0, 1		# Realign memory address
+	move	$s5, $s0		# Set tail pointer
 	addi	$t4, $0, 0x041f		# t4 = value of location of tail beginning
 	sh	$t4, ($s0)		# store location of tail
 	lb	$a0, 1($s0)		# get x loc for tail
@@ -166,8 +167,12 @@ _buildSnake:
 	# returns: $s1 is # of frogs populated by end
 	#
 _populateFrogs:
+	move	$s4, $s0		# Set head pointer
 	li	$a2, 3			# Set color to green
 	li	$t4, 0			# t0 = attempt counter, loop stops at 32
+			
+	li	$s6, 0xE3		# Set initial direction to right
+	sb	$s6, 0xFFFF0004
  
   LOOP_FROG:
 	beq	$t4, 32, GAME_START	# If 32 attempts have been made, ready to start game
@@ -196,7 +201,11 @@ _populateFrogs:
 #	s3 = game start time
 #	s4 = head pointer
 #	s5 = tail pointer
-#	s6 = keyboard tracker
+#	s6 = keyboard tracker/current direction
+#		0 = up, 1 = right, 2 = down, 3 = left
+#	s7 = previous direction
+#	t8 = change_dir check
+#		if == 1 and trying to change direction again, lose
 #	t9 = last system time of animation run
 #**************************************************************************************
 
@@ -223,22 +232,49 @@ TIME_LOOP:
 #**************************************************************************************
 
 CHECK_DIR:
-	lb	$s6, 0xFFFF0004
+	lbu	$s6, 0xFFFF0004
 	beq	$s6, 0x42, GAME_OVER	# quit the game if b is pressed
-	beq	$s6, 0xE0, GO_UP	# go up if w is pressed
-	beq	$s6, 0xE1, GO_LE	# go left if a is pressed
-	beq	$s6, 0xE2, GO_DO	# go down if s is pressed
-	beq	$s6, 0xE3, GO_RI	# go right if d is pressed
 	
-	GO_UP:
-		j TIME_LOOP
-	GO_LE:
-		j TIME_LOOP
-	GO_DO:
-		j TIME_LOOP
-	GO_RI:
-		j TIME_LOOP
+	lb	$a1, ($s4) 		# Get head y coordinate	
+	lb	$a0, 1($s4)		# Get head x coordinate
+	
+	beq	$s6, 0xE0, _UP		# go up if w is pressed
+	beq	$s6, 0xE2, _LE		# go left if a is pressed
+	beq	$s6, 0xE1, _DO		# go down if s is pressed
+	beq	$s6, 0xE3, _RI		# go right if d is pressed
+	
+	_UP:	addi	$a1, $a1, -1	# Decrement y
+		beq	$a1, -1, UP_63
+		j 	CHECK_NEXT
 		
+	_LE:	addi	$a0, $a0, -1	# Decrement x
+		beq	$a0, -1, LE_63
+		j 	CHECK_NEXT
+		
+	_DO:	addi	$a1, $a1, 1	# Increment y
+		beq	$a1, 64, DO_0
+		j 	CHECK_NEXT
+		
+	_RI:	addi	$a0, $a0, 1	# Increment x
+		beq	$a0, 64, RI_0
+		j 	CHECK_NEXT
+		
+#**************************************************************************************
+
+UP_63:	
+	li	$a1, 63
+	j	CHECK_NEXT
+
+LE_63:
+	li	$a0, 63
+	j	CHECK_NEXT
+	
+DO_0: 	li	$a1, 0
+	j	CHECK_NEXT
+	
+RI_0:	li	$a0, 0
+	j	CHECK_NEXT
+
 #**************************************************************************************
 
 CHECK_NEXT: 
@@ -257,10 +293,38 @@ CHECK_NEXT:
 # Arguments: 
 # Trashes: 
 #
-MOVE:
-	# Increments head pointer and sets that LED on
-	# Turns tail LED off and increments tail pointer
+MOVE:	
+	li	$a2, 2		# Set next LED to snake
+	jal	_setLED		# Turn on next LED
+	
+	la	$t7, _snake		# Get address of queue
+	addi	$t7, $t7, 79		# Add max offset
+	sub	$t7, $t7, $s4		
+	move	$a3, $s4
+	bltzal	$t7, RESET_QUEUE	# Reached end of snake mem, wrap around
+	move	$s4, $a3
+	
+	addi	$s4, $s4, 2	# Increment head pointer
+	sb	$a1, ($s4)	# Store new y coordinate
+	sb	$a0, 1($s4)	# Store new x coordinate
 
+	lb	$a1, ($s5)	# Get tail y coordinate
+	lb	$a0, 1($s5)	# Get tail x coordinate
+	li	$a2, 0		# Turn tail off
+	jal	_setLED		
+	
+	la	$t7, _snake		# Get address of queue
+	addi	$t7, $t7, 79		# Add max offset
+	sub	$t7, $t7, $s5		
+	move	$a3, $s5
+	bltzal	$t7, RESET_QUEUE	# Reached end of snake mem, wrap around
+	move	$s5, $a3	
+	
+	addi	$s5, $s5, 2	# increment tail pointer
+	move	$s7, $s6	# Set previous direction
+	li	$t8, 0		# Reset change_dir check
+	j TIME_LOOP		# Begin next animation sequence
+	
 #**************************************************************************************
 
 # Moves head forward (but not tail) and increments score
@@ -269,9 +333,30 @@ MOVE:
 # Trahes:
 #
 GROW: 
-	# Increment head pointer 
-	# Set new head LED on
-	addi	$s2, $s2, 1		# Score is incremented by 1
+	li	$a2, 2		# Set next LED to snake
+	jal	_setLED		# Turn on next LED
+	
+	la	$t7, _snake		# Get address of queue
+	addi	$t7, $t7, 79			# Add max offset
+	sub	$t7, $t7, $s4		
+	move	$a3, $s4
+	bltzal	$t7, RESET_QUEUE	# Reached end of snake mem, wrap around
+	move	$s4, $a3
+	
+	addi	$s4, $s4, 2	# Increment head pointer
+	sb	$a1, ($s4)	# Store new y coordinate
+	sb	$a0, 1($s4)	# Store new x coordinate
+	addi	$s2, $s2, 1	# Increment score
+	move	$s7, $s6	# Set previous direction
+	li	$t8, 0		# Reset change_dir check
+	j 	TIME_LOOP	# Start next animation
+
+#**************************************************************************************
+
+RESET_QUEUE:
+	la	$a3, _snake
+	addi	$a3, $a3, 1
+	jr	$ra
 
 #**************************************************************************************
 
@@ -285,8 +370,31 @@ GROW:
 # Trashes: 
 #
 CHANGE_DIR:
+	beq	$t8, 3, LOSE		# Stuck in a corner, LOSE
+	blt	$s6, 0xE2, GO_LE	# If moving up/down, change direction to left
 	
+	beq	$t8, 2, GO_DO
+	li	$s6, 0xE0		# If moving left/right, change dir to up
+	sb	$s6,0xFFFF0004		# Store new dir
+	addi	$t8, $t8, 1		# Increment change_dir check
+	j	CHECK_DIR
+	
+GO_DO:	li	$s6, 0xE1		# If moving left/right, change dir to up
+	sb	$s6,0xFFFF0004		# Store new dir
+	addi	$t8, $t8, 1		# Increment change_dir check
+	j	CHECK_DIR
 
+GO_LE:	beq	$t8, 2, GO_RI		# If already tried left, go right
+	
+	li	$s6, 0xE2		# If moving up/down, change dir to left
+	sb	$s6,0xFFFF0004		# Store new dir
+	addi	$t8, $t8, 1		# Increment change_dir check
+	j	CHECK_DIR
+	
+GO_RI:	li	$s6, 0xE3		# If moving up/down, change dir to left
+	sb	$s6,0xFFFF0004		# Store new dir
+	addi	$t8, $t8, 1		# Increment change_dir check
+	j	CHECK_DIR
 
 #**************************************************************************************
 #				Game loop over
@@ -307,6 +415,7 @@ LOSE:	li	$v0, 4			# Print string service
 	j	GAME_OVER
 
 GAME_OVER:
+	li	$v0, 4
 	la	$a0, score_message	# Load score_message
 	syscall				# Print string
 	
