@@ -11,11 +11,11 @@ Process:
 3. Populate frogs
 4. Initialize timer/game
 5. Game Loop
-  1. Timer loop
-  2. Check Direction
-    1. Change direction
-  3. Move
-  4. Grow
+  - Timer loop
+  - Check Direction
+    - Change direction
+  - Move
+  - Grow
 6. Game over
   - Display win/lose message
   - Display time and score
