@@ -46,3 +46,4 @@ Notes:
 - Changed A to be left and S to be down
 - Key presses on the keyboard won't work until one press on the on-screen keys on the simulator
 - Trying to move in the opposite direction of current movement (i.e. moving left when already moving right) will trigger loss
+- Liable to crash if keys are pressed too quickly
