@@ -19,3 +19,7 @@ Process:
 6. Game over
   - Display win/lose message
   - Display time and score
+
+Notes: 
+- Changed A to be left and S to be down
+- Key presses on the keyboard won't work until one press on the on-screen keys on the simulator
